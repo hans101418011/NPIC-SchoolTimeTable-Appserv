@@ -1,0 +1,93 @@
+@charset "utf-8";
+
+a{
+	text-decoration: none;
+}
+
+header{
+	background-color: hsl(120,50%,50%);
+}
+#search{
+	background-color: hsl(210,70%,80%);
+	padding: 20px;
+}
+#result{
+	background-color: hsl(190,100%,90%);
+}
+#table{
+	width: 740px;
+	float: left;
+}
+#table table{
+	width: 700px;
+	margin: 30px auto ;
+}
+#table table td:first-child{
+	width: 100px;
+}
+#table table td{
+	border: solid 1px hsl(0,0%,0%);
+	text-align: center;
+}
+#chose{
+	background-color: hsl(280,80%,90%);
+	width: 200px;
+	margin: 10px 0px;
+	padding: 5px;
+	float: left;
+	border-radius: 10px;
+}
+#chose #function{
+	text-align: center;
+}
+#chose fieldset{
+	padding: 10px;
+	margin: 5px;
+	border: 1px double hsl(0,0%,60%) ;
+	border-radius: 5px;
+}
+#chose fieldset legend{
+	padding: 5px;
+}
+#list{
+	background-color: hsl(200,60%,90%);
+	clear: both;
+	padding: 20px;
+}
+#list table{
+	text-align: center;
+	border: solid 1px hsl(0,0%,0%);
+}
+#list table tr:hover{
+	background-color: hsla(0,0%,100%,0.5);
+}
+#list table td{
+	border: solid 1px hsl(0,0%,0%);
+	padding: 4px;
+	vertical-align: middle;
+}
+#list table .sort{
+	width: 18px;
+}
+#list table .elec{
+	width: 20px;
+}
+#list table .clas{
+	width: 32px;
+}
+#list table .teac{
+	width: 64px;
+	word-break:keep-all;
+	word-wrap:normal;
+}
+.othe{
+	word-wrap:normal;
+}
+
+footer{
+	background-color: hsl(250,100%,90%);
+	font-size: 75%;
+	line-height: 150%;
+	padding: 20px;
+	text-shadow:1px 1px 1px hsla(0,0%,40%,0.4);
+}
