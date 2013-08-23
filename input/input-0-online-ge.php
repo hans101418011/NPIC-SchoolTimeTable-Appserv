@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-	<title>cURL 3</title>
+	<title>cURL online (通識ver)</title>
 </head>
 
 <body>
@@ -11,14 +11,23 @@
 
 		include("config.php");
 
-		// $target = "http://webs3.npic.edu.tw/selectn/search.asp";
-		
-		// $str=iconv("big5","UTF-8",$str); 
-		// mb_convert_encoding ( string $str , string $to_encoding [, mixed $from_encoding ] )
+		$action = "http://webs3.npic.edu.tw/selectn/clist.asp";
+		//$action = "http://www.schrenk.com/nostarch/webbots/form_analyzer.php";
+		$ref = "http://webs3.npic.edu.tw/selectn/search.asp";
 
-		$target = "http://127.0.0.1/curl/sample/test2_b5.html";
+		$method="POST";
+		$data_array = array("dept"=>"", "sect"=>"", "grade"=>"", "cscn"=>"", "thname"=>"", "dayinweek"=>"", "selnscode"=>"", "periods"=>"", "room"=>"");
+
+		$data_array["sect"] = "0-通識教育中心";
+
+		$data_array["sect"]=iconv("UTF-8","big5",$data_array["sect"]);
+
+		$response = http($target=$action,$ref,$method,$data_array,EXCL_HEAD);
+		/*
+		$target = "http://127.0.0.1/curl/test2_b5.html";
 		$web_page = http_get($target,$ref);
-		$web_page['FILE']=iconv("big5","UTF-8",$web_page['FILE']); 
+		*/
+		$web_page['FILE']=iconv("big5","UTF-8",$response['FILE']); 
 
 		$table_tag_array = parse_array($web_page['FILE'],"<table","</table>");	//擷取table內的內容
 		$tr_tag_array = parse_array($table_tag_array[0],"<tr","</tr>");			//擷取tr內的內容，依tr個數編成陣列
@@ -81,6 +90,12 @@
 				}
 				else
 				{
+					str_replace('href=http' , "" , $td_tag_array[$num_td],$a);
+					if($a)
+					{
+						$td_tag_array[$num_td]=str_replace('href=http' , 'href="http' , $td_tag_array[$num_td],$a);
+						$td_tag_array[$num_td]=str_replace(' target' , '" target' , $td_tag_array[$num_td],$a);
+					}
 					$td_tag_array[$num_td] = str_replace('"' , "\"" , $td_tag_array[$num_td]);
 				}
 				unset($td_yc);
@@ -168,11 +183,11 @@
 				'".$input_data_array["limit"]."',
 				'".$input_data_array["other"]."',
 				'".$input_data_array["chose"]."');";
-			mysql_query($sql,$link) or die("寫入錯誤!<br>".mysql_error());
+			mysql_query($sql,$link) or die("<p>寫入錯誤!</p><pre>".mysql_error()."</pre>");
 
 			unset($td_21_chose);
 		}
-
+		echo "<p>共".($num_tr-1)."筆資料input</p>";
 		function Noformat($in_string)
 		{
 			/*$in_string=str_replace(">" , "" , $in_string);

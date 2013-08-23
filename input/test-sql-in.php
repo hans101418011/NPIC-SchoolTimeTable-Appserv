@@ -1,29 +1,33 @@
 <!doctype html>
 <html>
 <head>
-	<title>cURL 3</title>
+	<title>sql</title>
 </head>
 
 <body>
 	<?php
-		include("_LIB_http/LIB_http.php");
-		include("_LIB_http/LIB_parse.php");
-
+		include("../_LIB_http/LIB_http.php");
+		include("../_LIB_http/LIB_parse.php");
 		include("config.php");
-
-		// $target = "http://webs3.npic.edu.tw/selectn/search.asp";
 		
-		// $str=iconv("big5","UTF-8",$str); 
-		// mb_convert_encoding ( string $str , string $to_encoding [, mixed $from_encoding ] )
 
-		$target = "http://127.0.0.1/curl/sample/test2_b5.html";
+
+		$action = "http://webs3.npic.edu.tw/selectn/clist.asp";
+		$ref = "http://webs3.npic.edu.tw/selectn/search.asp";
+
+		$method="POST";
+		$data_array = array("dept"=>"", "sect"=>"", "grade"=>"", "cscn"=>"", "thname"=>"", "dayinweek"=>"", "selnscode"=>"", "periods"=>"", "room"=>"");
+		$data_array["sect"] = "0-通識教育中心";
+		$data_array["sect"]=iconv("UTF-8","big5",$data_array["sect"]);
+		$response = http($target=$action,$ref,$method,$data_array,EXCL_HEAD);
+		/*
+		$target = "http://127.0.0.1/curl/test2_b5.html";
 		$web_page = http_get($target,$ref);
-		$web_page['FILE']=iconv("big5","UTF-8",$web_page['FILE']); 
+		*/
+		$web_page['FILE']=iconv("big5","UTF-8",$response['FILE']); 
 
 		$table_tag_array = parse_array($web_page['FILE'],"<table","</table>");	//擷取table內的內容
 		$tr_tag_array = parse_array($table_tag_array[0],"<tr","</tr>");			//擷取tr內的內容，依tr個數編成陣列
-
-
 		for($num_tr=1;$num_tr<count($tr_tag_array);$num_tr++)		//跑tr陣列的內容
 		{
 			$td_tag_array = parse_array($tr_tag_array[$num_tr],"<td>","</td>");	//將tr內多個td編成陣列
@@ -81,6 +85,12 @@
 				}
 				else
 				{
+					str_replace('href=http' , "" , $td_tag_array[$num_td],$a);
+					if($a)
+					{
+						$td_tag_array[$num_td]=str_replace('href=http' , 'href="http' , $td_tag_array[$num_td],$a);
+						$td_tag_array[$num_td]=str_replace(' target' , '" target' , $td_tag_array[$num_td],$a);
+					}
 					$td_tag_array[$num_td] = str_replace('"' , "\"" , $td_tag_array[$num_td]);
 				}
 				unset($td_yc);
@@ -110,75 +120,26 @@
 				"max"=>$td_21[0],
 				"limit"=>$td_21[1],
 				"other"=>$td_21[2],
-				"chose"=>$td_21_chose);
+				"chose"=>$td_21_chose,
+				"user"=>Config_Passwd
+			);
 
-			echo"<pre>";
-			print_r($input_data_array);
-			echo"</pre>";
 
-			$sql = "INSERT INTO `subject` (
-				`sn`, 
-				`name`, 
-				`sort`, 
-				`elective`, 
-				`credit`, 
-				`semester`, 
-				`institution`, 
-				`department`, 
-				`class`, 
-				`teacher`, 
-				`monday`, 
-				`tuesday`, 
-				`wednesday`, 
-				`thursday`, 
-				`friday`, 
-				`saturday`, 
-				`sunday`, 
-				`student`, 
-				`room`, 
-				`web`, 
-				`annex`, 
-				`max`, 
-				`limit`, 
-				`other`, 
-				`chose`
-				) VALUES (
-				'".$input_data_array['sn']."',
-				'".$input_data_array["name"]."',
-				'".$input_data_array['sort']."',
-				'".$input_data_array['elective']."',
-				".$input_data_array['credit'].",
-				'".$input_data_array["semester"]."',
-				'".$input_data_array["institution"]."',
-				'".$input_data_array["department"]."',
-				'".$input_data_array["class"]."',
-				'".$input_data_array["teacher"]."',
-				'".$input_data_array["monday"]."',
-				'".$input_data_array["tuesday"]."',
-				'".$input_data_array["wednesday"]."',
-				'".$input_data_array["thursday"]."',
-				'".$input_data_array["friday"]."',
-				'".$input_data_array["saturday"]."',
-				'".$input_data_array["sunday"]."',
-				'".$input_data_array["student"]."',
-				'".$input_data_array["room"]."',
-				'".$input_data_array["web"]."',
-				'".$input_data_array["annex"]."',
-				'".$input_data_array["max"]."',
-				'".$input_data_array["limit"]."',
-				'".$input_data_array["other"]."',
-				'".$input_data_array["chose"]."');";
-			mysql_query($sql,$link) or die("寫入錯誤!<br>".mysql_error());
+			$action = "http://127.0.0.1/curl/input/confidential/test-sql-receive.php";
+			$ref = "http://127.0.0.1";
+			$method="POST";
+			$response = http($target=$action,$ref,$method,$input_data_array,EXCL_HEAD);
+			echo($response['FILE']);
 
 			unset($td_21_chose);
 		}
+		echo "<p>共".($num_tr-1)."筆資料</p>";
+
 
 		function Noformat($in_string)
 		{
-			/*$in_string=str_replace(">" , "" , $in_string);
-			$in_string=str_replace("<" , "" , $in_string);*/
+
 			$in_string=str_replace("\t" , "" , $in_string);
-			//$in_string=str_replace(" " , "" , $in_string);
 			$in_string=str_replace("\r\n" , "" , $in_string);
 			$in_string=str_replace("\n" , "" , $in_string);
 			return $in_string;
