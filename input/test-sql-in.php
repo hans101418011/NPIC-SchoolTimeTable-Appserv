@@ -10,8 +10,9 @@
 		include("../_LIB_http/LIB_parse.php");
 		include("config.php");
 		
-
-
+/*---------------------------------------------------
+	利用cURL模擬檢索通識課取得結果
+----------------------------------------------------*/
 		$action = "http://webs3.npic.edu.tw/selectn/clist.asp";
 		$ref = "http://webs3.npic.edu.tw/selectn/search.asp";
 
@@ -20,12 +21,12 @@
 		$data_array["sect"] = "0-通識教育中心";
 		$data_array["sect"]=iconv("UTF-8","big5",$data_array["sect"]);
 		$response = http($target=$action,$ref,$method,$data_array,EXCL_HEAD);
-		/*
-		$target = "http://127.0.0.1/curl/test2_b5.html";
-		$web_page = http_get($target,$ref);
-		*/
 		$web_page['FILE']=iconv("big5","UTF-8",$response['FILE']); 
 
+
+/*---------------------------------------------------
+	處理取得的網頁資料
+----------------------------------------------------*/
 		$table_tag_array = parse_array($web_page['FILE'],"<table","</table>");	//擷取table內的內容
 		$tr_tag_array = parse_array($table_tag_array[0],"<tr","</tr>");			//擷取tr內的內容，依tr個數編成陣列
 		for($num_tr=1;$num_tr<count($tr_tag_array);$num_tr++)		//跑tr陣列的內容
@@ -38,6 +39,10 @@
 				$td_tag_array[$num_td]=str_replace("</TD>" , "" , $td_tag_array[$num_td]);	
 				$td_tag_array[$num_td]=Noformat($td_tag_array[$num_td]);	//將td裡的多餘空白換行等格式去掉
 
+
+/*---------------------------------------------------
+	針對備註欄位的資料做處理
+----------------------------------------------------*/
 				if($num_td==21)		//額外處理第21個的td內容
 				{
 					$td_21 = explode("/",$td_tag_array[$num_td]);		//以斜線分割成陣列(3個)
@@ -85,6 +90,9 @@
 				}
 				else
 				{
+/*---------------------------------------------------
+	非備註欄位的資料處理
+----------------------------------------------------*/
 					str_replace('href=http' , "" , $td_tag_array[$num_td],$a);
 					if($a)
 					{
@@ -95,6 +103,13 @@
 				}
 				unset($td_yc);
 			}
+
+
+/*---------------------------------------------------
+	將資料存到陣列
+	再次利用cURL
+	POST陣列資料到負責寫入資料庫的檔案
+----------------------------------------------------*/
 			$input_data_array = array(
 				"sn"=>$td_tag_array[0],
 				"name"=>$td_tag_array[1],
@@ -133,9 +148,18 @@
 
 			unset($td_21_chose);
 		}
+
+
+/*---------------------------------------------------
+	將迴圈跑的次數印出
+----------------------------------------------------*/
 		echo "<p>共".($num_tr-1)."筆資料</p>";
 
 
+
+/*---------------------------------------------------
+	一個清除換行和空行的function
+----------------------------------------------------*/
 		function Noformat($in_string)
 		{
 
