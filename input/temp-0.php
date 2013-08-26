@@ -10,7 +10,7 @@
 		
 		// $target = "http://webs3.npic.edu.tw/selectn/search.asp";
 		
-		$target = "http://127.0.0.1/curl/sample/search.asp";
+		$target = "http://127.0.0.1/curl/input/sample/search.asp";
 		$web_page = http_get($target,$ref);
 
 		$select_tag_array = parse_array($web_page['FILE'],"<select","</select>");

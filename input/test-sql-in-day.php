@@ -31,12 +31,12 @@
 
 	for($num_dept=0;$num_dept<count($search_dept);$num_dept++)
 	{
-		for($num_sect=0;$num_sect<count($search_sect[$num_dept]);$num_sect++)
+		for($num_sect=0;$num_sect<count($search_sect);$num_sect++)
 		{
 			for($num_grade=0;$num_grade<$search_grade[$num_dept];$num_grade++)
 			{
 				$data_array["dept"] = $search_dept[$num_dept];
-				$data_array["sect"] = $search_sect[$num_dept][$num_sect];
+				$data_array["sect"] = $search_sect[$num_sect];
 				$data_array["grade"] = $search_grade_conver[$num_grade];
 				$data_array["dept"] = iconv("UTF-8","big5",$data_array["dept"]);
 				$data_array["sect"] = iconv("UTF-8","big5",$data_array["sect"]);
@@ -75,13 +75,44 @@
 								$td_21[2] .=")";									//字串結尾加上再加上括號 (因為有些會缺)
 							}
 
-							if($num_dept==0)
-							{
-								$td_21[2] = td21_Society($td_tag_array[$num_td]);
-							}
 							if($num_dept==5)
 							{
-								$td_21_chose = td21_GE($td_21[2]);
+								$td_21_o = str_replace("適用" , ")、" , $td_21[2]);	//將前面分割陣列最後一個內容 適用 這詞取代
+								$td_21_year = parse_array($td_21_o,"\)","\(");		//擷取多個右括和左刮中的入學年存為陣列(反斜線是因為正規表達式)
+								$td_21_class = parse_array($td_21_o,"\(","\)");		//擷取多個左刮和右括中的系所存為陣列(反斜線是因為正規表達式)
+								for($h=0;$h<count($td_21_class);$h++)				//跑迴圈
+								{
+									$td_21_c[$h] = explode("、",$td_21_class[$h]);	//分割系所
+								}
+								$x=0;
+								for($i=0;$i<count($td_21_year);$i++)				
+								{
+									$td_21_year[$i] = str_replace(")、" , "" , $td_21_year[$i]);	//將用來分割的字串刪掉
+									$td_21_year[$i] = str_replace("(" , "" , $td_21_year[$i]);		//將用來分割的字串刪掉
+									for($j=0;$j<count($td_21_c[$i]);$j++)
+									{
+										$td_21_c[$i][$j] = str_replace(")" , "" , $td_21_c[$i][$j]);	//將用來分割的字串刪掉
+										$td_21_c[$i][$j] = str_replace("(" , "" , $td_21_c[$i][$j]);	//將用來分割的字串刪掉
+										$td_yc[$x++]=$td_21_year[$i].$td_21_c[$i][$j];			//新創陣列將入學年和系所合併
+									}
+								}
+								for($k=0;$k<count($td_yc);$k++)		//印出第21個td處裡過後的內容
+								{
+									if($k==count($td_yc)-1)
+									{
+										$td_21_chose.=$td_yc[$k];
+									}
+									else
+									{
+										$td_21_chose.=$td_yc[$k].",";
+									}
+								}
+
+								$td_other = explode(")",$td_21_o);	//印出額外註記
+								if($td_other[count($td_other)-1])
+								{
+									$td_21_chose.="，(".$td_other[count($td_other)-1].")";
+								}
 							}
 						}
 						else
@@ -147,94 +178,14 @@
 		/*---------------------------------------------------
 			將迴圈跑的次數印出
 		----------------------------------------------------*/
-				echo "<p>".$search_dept[$num_dept]." ".$search_sect[$num_dept][$num_sect]." ".$search_grade_conver[$num_grade]." 共".($num_tr-1)."筆資料</p>\n";
+				echo "<p>".$search_dept[$num_dept]." ".$search_sect[$num_sect]." ".$search_grade_conver[$num_grade]." 共".($num_tr-1)."筆資料</p>\n";
 
 				$time_rnd=rand(6,10);
 				sleep($time_rnd);
 			}
 		}
 	}
-
-
-
-	function td21_Society($td_21)
-	{
-		$td_21_Soc = explode("/",$td_21);
-		for($td21_society=3;$td21_society<count($td_21_Soc);$td21_society++)
-		{
-			$$td_21_Soc[2].="/".$td_21_Soc[$td21_society];
-		}
-		return $td_21_Soc[2];
-	}
-
-	function td21_PE($num_dept,$string)
-	{
-		if($num_dept==3)
-		{
-			$x = str_replace("選項" , "" , $string);
-			$x = str_replace("進四" , "" , $x);
-			$x = parse_array($x,"\(","\)");
-			$x = str_replace(")" , "" , $x[0]);
-			$x = str_replace("(" , "" , $x);
-			$y = explode("、",$x);
-
-			for($num=0;$num<count($y);$num++)
-			{
-				if($num==count($y)-1)
-				{
-					$td_21_chose.=$y[$num];;
-				}
-				else
-				{
-					$td_21_chose.=$y[$num].",";
-				}
-			}
-			
-		}
-		
-		return $td_21_chose;
-	}
-
-	function td21_GE($td_21_GE)
-	{
-		$td_21_o = str_replace("適用" , ")、" , $td_21_GE);	//將前面分割陣列最後一個內容 適用 這詞取代
-		$td_21_year = parse_array($td_21_o,"\)","\(");		//擷取多個右括和左刮中的入學年存為陣列(反斜線是因為正規表達式)
-		$td_21_class = parse_array($td_21_o,"\(","\)");		//擷取多個左刮和右括中的系所存為陣列(反斜線是因為正規表達式)
-		for($h=0;$h<count($td_21_class);$h++)				//跑迴圈
-		{
-			$td_21_c[$h] = explode("、",$td_21_class[$h]);	//分割系所
-		}
-		$x=0;
-		for($i=0;$i<count($td_21_year);$i++)				
-		{
-			$td_21_year[$i] = str_replace(")、" , "" , $td_21_year[$i]);	//將用來分割的字串刪掉
-			$td_21_year[$i] = str_replace("(" , "" , $td_21_year[$i]);		//將用來分割的字串刪掉
-			for($j=0;$j<count($td_21_c[$i]);$j++)
-			{
-				$td_21_c[$i][$j] = str_replace(")" , "" , $td_21_c[$i][$j]);	//將用來分割的字串刪掉
-				$td_21_c[$i][$j] = str_replace("(" , "" , $td_21_c[$i][$j]);	//將用來分割的字串刪掉
-				$td_yc[$x++]=$td_21_year[$i].$td_21_c[$i][$j];			//新創陣列將入學年和系所合併
-			}
-		}
-		for($k=0;$k<count($td_yc);$k++)		//印出第21個td處裡過後的內容
-		{
-			if($k==count($td_yc)-1)
-			{
-				$td_21_chose.=$td_yc[$k];
-			}
-			else
-			{
-				$td_21_chose.=$td_yc[$k].",";
-			}
-		}
-
-		$td_other = explode(")",$td_21_o);	//印出額外註記
-		if($td_other[count($td_other)-1])
-		{
-			$td_21_chose.="，(".$td_other[count($td_other)-1].")";
-		}
-		return $td_21_chose;
-	}
+	
 
 /*---------------------------------------------------
 一個清除換行和空行的function

@@ -15,7 +15,7 @@
 		// $str=iconv("big5","UTF-8",$str); 
 		// mb_convert_encoding ( string $str , string $to_encoding [, mixed $from_encoding ] )
 
-		$target = "http://127.0.0.1/curl/test_b5.html";
+		$target = "http://127.0.0.1/curl/input/sample/test_b5.html";
 		$web_page = http_get($target,$ref);
 		$web_page['FILE']=iconv("big5","UTF-8",$web_page['FILE']); 
 
