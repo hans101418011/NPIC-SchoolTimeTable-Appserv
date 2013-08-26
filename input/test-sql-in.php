@@ -75,6 +75,11 @@
 								$td_21[2] .=")";									//字串結尾加上再加上括號 (因為有些會缺)
 							}
 
+							str_replace('體育' , "" , $td_tag_array[1],$class_PE);
+							if($class_PE)
+							{
+								$td_21_chose = td21_PE($num_dept,$td_21[2]);
+							}
 							if($num_dept==0)
 							{
 								$td_21[2] = td21_Society($td_tag_array[$num_td]);
@@ -191,7 +196,30 @@
 			}
 			
 		}
-		
+		if($num_dept==4)
+		{
+			str_replace('102' , "" , $string,$grade102);
+			if($grade102)
+			{
+				$x = parse_array($string,"\(","\)");
+				$x = str_replace(")" , "" , $x[0]);
+				$x = str_replace("(" , "" , $x);
+				$x = str_replace('102' , "、" ,$x);
+				$y = explode("、",$x);
+				for($num=1;$num<count($y);$num++)
+				{
+					if($num==count($y)-1)
+					{
+						$td_21_chose.="102".$y[$num];;
+					}
+					else
+					{
+						$td_21_chose.="102".$y[$num].",";
+					}
+				}
+			}
+		}
+
 		return $td_21_chose;
 	}
 
