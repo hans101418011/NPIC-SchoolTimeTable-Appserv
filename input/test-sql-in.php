@@ -9,7 +9,7 @@
 	include("_LIB_http/LIB_http.php");
 	include("_LIB_http/LIB_parse.php");
 	include("config.php");
-	
+	$total_tr=0;
 /*---------------------------------------------------
 利用cURL模擬檢索通識課取得結果
 ----------------------------------------------------*/
@@ -33,6 +33,7 @@
 	{
 		for($num_sect=0;$num_sect<count($search_sect[$num_dept]);$num_sect++)
 		{
+			echo "<p>\n";
 			for($num_grade=0;$num_grade<$search_grade[$num_dept];$num_grade++)
 			{
 				$data_array["dept"] = $search_dept[$num_dept];
@@ -152,49 +153,70 @@
 		/*---------------------------------------------------
 			將迴圈跑的次數印出
 		----------------------------------------------------*/
-				echo "<p>".$search_dept[$num_dept]." ".$search_sect[$num_dept][$num_sect]." ".$search_grade_conver[$num_grade]." 共".($num_tr-1)."筆資料</p>\n";
-
-				$time_rnd=rand(6,10);
-				sleep($time_rnd);
+				echo $search_dept[$num_dept]." ".$search_sect[$num_dept][$num_sect]." ".$search_grade_conver[$num_grade]." 共".($num_tr-1)."筆資料<br>\n";
+				$total_tr+=$num_tr;
+				if(count($tr_tag_array)==0)
+				{
+					$num_grade--;
+					$time_rnd=rand(1,3);
+					sleep($time_rnd);
+				}
+				else
+				{
+					$time_rnd=rand(6,10);
+					sleep($time_rnd);
+				}
+				
 			}
+			echo "</p>\n";
 		}
 	}
-
+	echo "<p>共 ".$total_tr." 筆資料</p>\n";
 
 
 	function td21_Society($td_21)
 	{
 		$td_21_Soc = explode("/",$td_21);
-		for($td21_society=3;$td21_society<count($td_21_Soc);$td21_society++)
+		for($td21_society=2;$td21_society<count($td_21_Soc);$td21_society++)
 		{
-			$$td_21_Soc[2].="/".$td_21_Soc[$td21_society];
+			if($td21_society==count($td_21_Soc)-1)
+			{
+				$td_21_S.=$td_21_Soc[$td21_society];
+			}
+			else
+			{
+				$td_21_S.=$td_21_Soc[$td21_society]."/";
+			}
 		}
-		return $td_21_Soc[2];
+		return $td_21_S;
 	}
 
 	function td21_PE($num_dept,$string)
 	{
 		if($num_dept==3)
 		{
-			$x = str_replace("選項" , "" , $string);
-			$x = str_replace("進四" , "" , $x);
-			$x = parse_array($x,"\(","\)");
-			$x = str_replace(")" , "" , $x[0]);
-			$x = str_replace("(" , "" , $x);
-			$y = explode("、",$x);
-
-			for($num=0;$num<count($y);$num++)
+			str_replace('102' , "" , $string,$grade102);
+			if($grade102)
 			{
-				if($num==count($y)-1)
+				$x = str_replace("選項" , "" , $string);
+				$x = str_replace("進四" , "" , $x);
+				$x = parse_array($x,"\(","\)");
+				$x = str_replace(")" , "" , $x[0]);
+				$x = str_replace("(" , "" , $x);
+				$y = explode("、",$x);
+
+				for($num=0;$num<count($y);$num++)
 				{
-					$td_21_chose.=$y[$num];;
-				}
-				else
-				{
-					$td_21_chose.=$y[$num].",";
+					if($num==count($y)-1)
+					{
+						$td_21_chose.="進四".$y[$num];;
+					}
+					else
+					{
+						$td_21_chose.="進四".$y[$num].",";
+					}
 				}
 			}
-			
 		}
 		if($num_dept==4)
 		{
