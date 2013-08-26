@@ -29,12 +29,12 @@
 
 	$data_array = array("dept"=>"", "sect"=>"", "grade"=>"", "cscn"=>"", "thname"=>"", "dayinweek"=>"", "selnscode"=>"", "periods"=>"", "room"=>"");
 
-	for($num_dept=0;$num_dept<count($search_dept);$num_dept++)
+	for($num_dept=4;$num_dept<5;$num_dept++)
 	{
-		for($num_sect=0;$num_sect<count($search_sect[$num_dept]);$num_sect++)
+		for($num_sect=1;$num_sect<2;$num_sect++)
 		{
-			echo "<p>\n";
-			for($num_grade=0;$num_grade<$search_grade[$num_dept];$num_grade++)
+			echo "<pre>\n";
+			for($num_grade=1;$num_grade<2;$num_grade++)
 			{
 				$data_array["dept"] = $search_dept[$num_dept];
 				$data_array["sect"] = $search_sect[$num_dept][$num_sect];
@@ -43,13 +43,19 @@
 				$data_array["sect"] = iconv("UTF-8","big5",$data_array["sect"]);
 				$data_array["grade"] = iconv("UTF-8","big5",$data_array["grade"]);
 				
+
+				$target = "http://127.0.0.1/curl/input/sample/sample-AJ.htm";
+				$web_page = http_get($target,$ref);
+				//$web_page['FILE']=iconv("big5","UTF-8",$web_page['FILE']); 
+				$web_page['FILE'] = mb_convert_encoding($web_page['FILE'],"UTF-8","big5");
+
+				/*
 				$action = "http://webs3.npic.edu.tw/selectn/clist.asp";
 				$ref = "http://webs3.npic.edu.tw/selectn/search.asp";
 				$method="POST";
 				$response = http($target=$action,$ref,$method,$data_array,EXCL_HEAD);
-				//$web_page['FILE']=iconv("big5","UTF-8",$response['FILE']); 
-				$web_page['FILE'] = mb_convert_encoding($response['FILE'],"UTF-8","big5");
-
+				$web_page['FILE']=iconv("big5","UTF-8",$response['FILE']); 
+				*/
 		/*---------------------------------------------------
 			處理取得的網頁資料
 		----------------------------------------------------*/
@@ -65,9 +71,9 @@
 						$td_tag_array[$num_td]=str_replace("</TD>" , "" , $td_tag_array[$num_td]);	
 						$td_tag_array[$num_td]=Noformat($td_tag_array[$num_td]);	//將td裡的多餘空白換行等格式去掉
 
-						if($num_dept==4&&$num_sect==1&&$num_grade==1&&$num_td==9)
+						if($num_td==9)
 						{
-							$td_tag_array[$num_td] = str_replace("?" , "劄" , $td_tag_array[$num_td]);	
+							$td_tag_array[$num_td] = str_replace("?" , "劄" , $td_tag_array[$num_td]);
 						}
 		/*---------------------------------------------------
 			針對備註欄位的資料做處理
@@ -144,12 +150,15 @@
 						"chose"=>$td_21_chose,
 						"user"=>Config_Passwd
 					);
+
+					print_r($input_data_array);
+					/*
 					$action = "http://127.0.0.1/curl/input/test-sql-receive.php";
 					$ref = "http://127.0.0.1";
 					$method="POST";
 					$response = http($target=$action,$ref,$method,$input_data_array,EXCL_HEAD);
 					echo($response['FILE']);
-
+					*/
 					unset($td_21_chose);
 				}
 
@@ -172,7 +181,7 @@
 				}
 				
 			}
-			echo "</p>\n";
+			echo "</pre>\n";
 		}
 	}
 	echo "<p>共 ".$total_tr." 筆資料</p>\n";
